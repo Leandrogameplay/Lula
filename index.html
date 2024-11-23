@@ -1,30 +1,145 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redes Sociais</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" charset="utf-8"></script>
+    <title>Análise Dinâmica de Jogos Steam</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+        canvas {
+            width: 100%;
+            height: 400px;
+        }
+        .graph-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .description {
+            text-align: center;
+            font-size: 16px;
+            margin-top: 10px;
+            color: #333;
+        }
+        .chart-container {
+            margin-bottom: 40px;
+        }
+        .chart-info {
+            text-align: center;
+            font-size: 18px;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Relatório das redes sociais</h1>
-        <nav>
-            <a href="index.html">Mundo</a>
-            <a href="#">Minha escola</a>
-        </nav>
-    </header>
-    <main class="graficos-section">
-        <section id="graficos-container" class="graficos-container">
-            <!-- crie os gráficos/texto aqui -->
-        </section>
-    </main>
-    <footer>
-        <p>Desenvolvido por Gui Lima</p>
-    </footer>
-    <script type="module" src="graficos/common.js"></script>
-    <script type="module" src="graficos/informacoesGlobais.js"></script>
-    <script type="module" src="graficos/quantidadeUsuarios.js"></script>
+    <div class="container">
+        <h1 class="graph-title">Análise Dinâmica dos Seus Jogos Steam</h1>
+
+        <!-- Gráfico de Jogos Comprados e na Lista de Desejos -->
+        <div class="chart-container">
+            <h2 class="chart-info">Distribuição dos Jogos Comprados e na Lista de Desejos</h2>
+            <canvas id="gamesChart"></canvas>
+            <p class="description">Este gráfico mostra a distribuição entre os jogos que você comprou e aqueles que você adicionou à sua lista de desejos. Passe o mouse sobre as partes do gráfico para ver a porcentagem de cada categoria.</p>
+        </div>
+
+        <!-- Gráfico de Jogos Comprados pelos Amigos -->
+        <div class="chart-container">
+            <h2 class="chart-info">Jogos Comprados por Seus Amigos</h2>
+            <canvas id="friendsChart"></canvas>
+            <p class="description">Aqui você pode ver quantos jogos da sua biblioteca você possui que também foram comprados pelos seus amigos. Passe o mouse sobre a barra para ver a porcentagem em relação ao total de jogos comprados.</p>
+        </div>
+    </div>
+
+    <script>
+        // Dados simulados
+        const jogosComprados = 20; // Jogos comprados por você
+        const jogosListaDesejos = 10; // Jogos na sua lista de desejos
+        const jogosAmigos = 15; // Jogos comprados pelos seus amigos
+
+        const totalJogos = jogosComprados + jogosListaDesejos;
+        const totalJogosCompradosAmigos = jogosComprados;
+
+        // Gráfico de Jogos Comprados e na Lista de Desejos
+        const ctxGames = document.getElementById('gamesChart').getContext('2d');
+        const gamesChart = new Chart(ctxGames, {
+            type: 'pie',
+            data: {
+                labels: ['Jogos Comprados', 'Jogos na Lista de Desejos'],
+                datasets: [{
+                    label: 'Distribuição de Jogos',
+                    data: [jogosComprados, jogosListaDesejos],
+                    backgroundColor: ['#36a2eb', '#ff6384'],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                const percentage = ((tooltipItem.raw / totalJogos) * 100).toFixed(2);
+                                return `${tooltipItem.label}: ${tooltipItem.raw} (${percentage}%)`;
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                    }
+                }
+            }
+        });
+
+        // Gráfico de Jogos Comprados pelos Amigos
+        const ctxFriends = document.getElementById('friendsChart').getContext('2d');
+        const friendsChart = new Chart(ctxFriends, {
+            type: 'bar',
+            data: {
+                labels: ['Jogos Comprados por Amigos'],
+                datasets: [{
+                    label: 'Quantidade de Jogos',
+                    data: [jogosAmigos],
+                    backgroundColor: '#4caf50',
+                    borderColor: '#388e3c',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                const percentage = ((tooltipItem.raw / jogosComprados) * 100).toFixed(2);
+                                return `${tooltipItem.label}: ${tooltipItem.raw} (${percentage}%)`;
+                            }
+                        }
+                    },
+                    legend: {
+                        display: false
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value + ' jogos';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
